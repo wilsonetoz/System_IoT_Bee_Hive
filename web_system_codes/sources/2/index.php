@@ -6,8 +6,7 @@ if ($_SESSION['iduser'] == "" || $_SESSION['nameuser'] == "") {
     header("Location: /login");
     exit();
 }
-// Define o ID da colmeia para esta página
-$current_colmeia_id = 2; // <<< MUDE ESTE VALOR PARA 3, 4, 5 NOS OUTROS ARQUIVOS
+$current_colmeia_id = 2;
 ?>
 
 <!DOCTYPE html>
