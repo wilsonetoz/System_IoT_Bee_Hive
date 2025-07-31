@@ -6,8 +6,7 @@ if ($_SESSION['iduser'] == "" || $_SESSION['nameuser'] == "") {
     header("Location: /login");
     exit();
 }
-// Define o ID da colmeia para esta página
-$current_colmeia_id = 5; // <<< MUDE ESTE VALOR PARA 3, 4, 5 NOS OUTROS ARQUIVOS
+$current_colmeia_id = 5;
 ?>
 
 <!DOCTYPE html>
@@ -74,7 +73,7 @@ $current_colmeia_id = 5; // <<< MUDE ESTE VALOR PARA 3, 4, 5 NOS OUTROS ARQUIVOS
             </thead>
             <tbody>
                 <?php
-                include("../conexao.php"); // Ajuste o caminho para connect.php
+                include("../conexao.php");
                 $query = "SELECT * FROM tb_dados2 WHERE colmeia_id = " . $current_colmeia_id . " ORDER BY timeStamp DESC";
                 $result = mysqli_query($conexao, $query);
                 if (mysqli_num_rows($result) > 0) {
