@@ -1,17 +1,20 @@
 <?php
-// Inclui o arquivo de conexão principal
-require '../conexao.php'; // Caminho corrigido para conexao.php
-$mysqli = $conexao; // Usa a conexão já estabelecida em conexao.php
+session_start();
+ob_start();
 
-if ($mysqli->connect_error) {
-    echo "Falha na conexão: " . $mysqli->connect_error;
+if (!isset($_SESSION['iduser']) || !isset($_SESSION['nameuser']) || $_SESSION['type'] !== 'admin') {
+    $_SESSION['secury'] = "Acesso negado. Apenas administradores podem inserir dados.";
+    header("Location: /login/");
     exit();
 }
 
-// Obtém o colmeia_id da URL, com um valor padrão de 1
-$colmeia_id = isset($_GET['colmeia_id']) ? intval($_GET['colmeia_id']) : 1;
+include("../conexao.php");
 
-// Inserção ao enviar formulário
+if ($conexao->connect_error) {
+    echo "Falha na conexão com o banco de dados: " . $conexao->connect_error;
+    exit();
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $data_hora = $_POST["data_hora"];
     $localizacao = $_POST["localizacao"];
@@ -19,76 +22,98 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tensao_bateria = $_POST["tensao_bateria"];
     $rssi = $_POST["rssi"];
 
-    // Altera para tb_dados2 e inclui colmeia_id
-    $sql = "INSERT INTO tb_dados2 (timeStamp, link_maps, n_sat, volt_bat, sinal, colmeia_id)
-            VALUES (?, ?, ?, ?, ?, ?)";
+    $colmeia_id = isset($_GET['colmeia_id']) ? intval($_GET['colmeia_id']) : 0;
 
-    $stmt = $mysqli->prepare($sql);
-    // Ajusta os tipos e o número de parâmetros para incluir colmeia_id
-    // 's' para string (data_hora, link_maps), 'i' para int (n_sat, sinal, colmeia_id), 'd' para double/decimal (volt_bat)
-    $stmt->bind_param("ssiidi", $data_hora, $localizacao, $num_satelites, $tensao_bateria, $rssi, $colmeia_id);
+    if ($colmeia_id > 0) {
+        $sql = "INSERT INTO tb_dados2 (timeStamp, link_maps, n_sat, volt_bat, sinal, colmeia_id)
+                VALUES (?, ?, ?, ?, ?, ?)";
 
-    if ($stmt->execute()) {
-        echo "<p>✅ Dados inseridos com sucesso!</p>";
+        $stmt = $conexao->prepare($sql);
+
+        $stmt->bind_param("ssiddi", $data_hora, $localizacao, $num_satelites, $tensao_bateria, $rssi, $colmeia_id);
+
+        if ($stmt->execute()) {
+            echo "<p style='color: green;'>✅ Dados inseridos com sucesso!</p>";
+        } else {
+            echo "<p style='color: red;'>❌ Erro ao inserir dados: " . $stmt->error . "</p>";
+        }
+
+        $stmt->close();
     } else {
-        echo "<p>❌ Erro ao inserir dados: " . $stmt->error . "</p>";
+        echo "<p style='color: red;'>❌ Erro: ID da colmeia inválido para inserção.</p>";
     }
-
-    $stmt->close();
 }
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Inserir Dados da Colmeia</title>
     <link rel="stylesheet" href="../bootstrap.min.css">
     <style>
-        body { padding: 20px; }
-        form { max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
-        label { display: block; margin-bottom: 5px; }
-        input[type="datetime-local"],
-        input[type="text"],
-        input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border-radius: 4px;
+        body { background-color: #E5E7E9; text-align: center; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h2 { color: #333; margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; text-align: left; }
+        input[type="datetime-local"], input[type="text"], input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
             border: 1px solid #ddd;
+            border-radius: 4px;
         }
         button {
-            background-color: #007bff;
+            background-color: #28a745;
             color: white;
-            padding: 10px 15px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #218838;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
         }
     </style>
 </head>
 <body>
-    <h2 align="center">Inserir Dados Manualmente para Colmeia ID: <?php echo htmlspecialchars($colmeia_id); ?></h2>
-    <form method="post">
-        <label>Data e Hora:</label><br>
-        <input type="datetime-local" name="data_hora" required><br><br>
+    <div class="container">
+        <h2>Inserir Dados Manualmente</h2>
+        <form method="post">
+            <label for="data_hora">Data e Hora:</label>
+            <input type="datetime-local" id="data_hora" name="data_hora" required><br>
 
-        <label>Localização (Link Maps):</label><br>
-        <input type="text" name="localizacao" placeholder="Ex: https://maps.app.goo.gl/..." required><br><br>
+            <label for="localizacao">Localização (Link Maps):</label>
+            <input type="text" id="localizacao" name="localizacao" placeholder="Ex: https://maps.app.goo.gl/abcdefg" required><br>
 
-        <label>Nº de Satélites:</label><br>
-        <input type="number" name="num_satelites" required><br><br>
+            <label for="num_satelites">Nº de Satélites:</label>
+            <input type="number" id="num_satelites" name="num_satelites" required><br>
 
-        <label>Tensão da Bateria:</label><br>
-        <input type="number" step="0.01" name="tensao_bateria" required><br><br>
+            <label for="tensao_bateria">Tensão da Bateria:</label>
+            <input type="number" id="tensao_bateria" name="tensao_bateria" step="0.01" required><br>
 
-        <label>Sinal RSSI:</label><br>
-        <input type="number" name="rssi" required><br><br>
+            <label for="rssi">Sinal RSSI:</label>
+            <input type="number" id="rssi" name="rssi" required><br>
 
-        <button type="submit">Inserir Dados</button>
-        <a href="/1/" class="btn btn-secondary">Voltar para Colmeia 01</a>
-    </form>
+            <button type="submit">Inserir Dados</button>
+        </form>
+        <a href="/inicio/" class="btn btn-secondary">Voltar para o inicio</a>
+    </div>
 </body>
 </html>
