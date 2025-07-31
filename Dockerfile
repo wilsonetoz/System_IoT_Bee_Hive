@@ -12,8 +12,8 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
 RUN echo '<VirtualHost *:80>\n\
-    DocumentRoot /var/www/html/web_system_codes/sources\n\
-    <Directory /var/www/html/web_system_codes/sources>\n\
+    DocumentRoot /var/www/html/web_system_codes\n\
+    <Directory /var/www/html/web_system_codes>\n\
         Options Indexes FollowSymLinks\n\
         AllowOverride All\n\
         Require all granted\n\
