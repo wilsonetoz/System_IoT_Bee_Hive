@@ -5,7 +5,7 @@ use PHPMailer\PHPMailer\Exception;
 
 require __DIR__ . '../../../vendor/autoload.php';
 
-include("connect.php"); // Certifique-se de que este caminho está correto também
+include("../../conexao.php");
 
 $date = date("Y-m-d G:i:s");
 $key = $_GET["k"];
@@ -20,22 +20,22 @@ if ($key == '<key>') { // Substitua <key> pela sua chave real!
     mysqli_query($conexao, $query);
     mysqli_close($conexao);
 
-    $mail = new PHPMailer(true); // O 'true' habilita exceções para tratamento de erros
+    $mail = new PHPMailer(true); 
 
     try {
         $mail->isSMTP();
-        $mail->Host = 'smtp.service'; // Seu servidor SMTP (ex: smtp.gmail.com)
+        $mail->Host = 'smtp.service';
         $mail->SMTPAuth = true;
-        $mail->Username = 'mail_from'; // Seu endereço de e-mail (ex: seuemail@dominio.com)
-        $mail->Password = 'pass';      // Sua senha do e-mail
-        $mail->Port = 587;             // Porta SMTP (587 para TLS, 465 para SSL)
-        $mail->setFrom('mail_from', 'name'); // Remetente: seu_email, seu_nome
-        $mail->addAddress('mail_send');       // Destinatário: email_do_destinatario
-        $mail->isHTML(true); // Define o formato do e-mail como HTML
-        $mail->Subject = 'subject'; // Assunto do e-mail
-        $mail->Body = 'text';       // Corpo do e-mail em HTML
+        $mail->Username = 'mail_from'; 
+        $mail->Password = 'pass';
+        $mail->Port = 587;
+        $mail->setFrom('mail_from', 'name');
+        $mail->addAddress('mail_send');
+        $mail->isHTML(true); 
+        $mail->Subject = 'subject';
+        $mail->Body = 'text';
 
-        $mail->send(); // Envia o e-mail
+        $mail->send(); 
     } catch (Exception $e) {
         $erroLog = "Erro ao enviar mensagem: {$mail->ErrorInfo}";
         echo "Erro ao enviar mensagem: {$mail->ErrorInfo}";
