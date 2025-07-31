@@ -29,8 +29,6 @@ if ($key == 'Vagalinha') {
         $mail->Username = 'testzx7213@gmail.com';
         $mail->Password = 'teste72@zx 13';
         $mail->Port = 587;
-        // Se o seu servidor SMTP exigir SSL, adicione a linha abaixo:
-        // $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // ou PHPMailer::ENCRYPTION_STARTTLS para TLS
 
         $mail->setFrom('testzx7213@gmail.com', 'Wilson');
         $mail->addAddress('zhuezx13@gmail.com');
@@ -39,8 +37,7 @@ if ($key == 'Vagalinha') {
         $mail->Subject = 'Alerta do Sistema Colmeia: Dados Recebidos';
         $mail->Body    = 'Corpo do email em HTML. Dados: ' . $date . ', ' . $url . ', ' . $n_sat . ', ' . $volt . ', ' . $sinal; // <<<<< Corpo do e-mail em HTML
 
-        $mail->send(); // Envia o e-mail
-        // Opcional: Para depuração, você pode descomentar a linha abaixo
+        $mail->send();
          echo 'Mensagem de e-mail enviada com sucesso!'; 
 
     } catch (Exception $e) {
