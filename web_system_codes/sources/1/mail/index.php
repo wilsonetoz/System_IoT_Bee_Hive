@@ -14,7 +14,7 @@ $n_sat = $_GET["s"];
 $volt = $_GET["t"];
 $sinal = $_GET["a"];
 
-if ($key == '<key>') { // Substitua <key> pela sua chave real!
+if ($key == '<key>') {
     $query = "INSERT INTO `" . DB . "`.`tb_dados2` (`timeStamp`,`link_maps`,`n_sat`,`volt_bat`,`sinal`)
       VALUES ('$date','\" . $url . \"', '\" . $n_sat . \"', '\" . $volt . \"', '\" . $sinal . \"')";
     mysqli_query($conexao, $query);
